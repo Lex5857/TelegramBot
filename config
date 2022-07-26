@@ -1,0 +1,7 @@
+TOKEN = 'Write your token here'
+
+currencies = {
+    'евро': 'EUR',
+    'рубль': 'RUB',
+    'доллар': 'USD',
+}
