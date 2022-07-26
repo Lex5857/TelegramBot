@@ -1,0 +1,37 @@
+import json
+import requests
+from config import currencies
+
+
+class ConvertionException(Exception):
+    pass
+
+
+class CurrencyConversion:
+    @staticmethod
+    def get_price(amount: str, quote: str, base: str):
+        try:
+            amount = float(amount.replace(',', '.'))
+        except ValueError:
+            raise ConvertionException(f'Число {amount} не распознано.')
+
+        try:
+            quote_code = currencies[quote.lower()]
+        except KeyError:
+            raise ConvertionException(f'Валюта {quote} не найдена.'
+                                      f'Могу написать доступные нажмите /values')
+
+        try:
+            base_code = currencies[base.lower()]
+        except KeyError:
+            raise ConvertionException(f'Валюта {base} не найдена.'
+                                      f'Могу написать доступные нажмите /values')
+
+        if quote == base:
+            raise ConvertionException(f'Невозможно конвертировать одинаковые валюты {base}.')
+
+        else:
+            r = requests.get(f'https://currate.ru/api/?get=rates&pairs={quote_code}{base_code}'
+                             f'&key=a384db39fbffc6a0e095e08d0c722ad2')
+            total_base = float(json.loads(r.content)['data'][currencies[quote] + currencies[base]]) * amount
+            return total_base
